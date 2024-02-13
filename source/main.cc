@@ -1,5 +1,6 @@
 #include <time.h>
 #include <iostream>
+#include <filesystem>
 #include <G4RunManager.hh>
 #include <G4MTRunManager.hh>
 #include <G4UImanager.hh>
@@ -9,10 +10,10 @@
 #include <G4VisExecutive.hh>
 #endif
 
-#include <GlobalParameters.hh>
-#include <GlobalData.hh>
+#include <GlobalSettings.hh>
 #include <Randomize.hh>
 #include <geant4/UserInitialization.hh>
+
 
 int main(int argc, char** argv)
 {
@@ -27,14 +28,14 @@ int main(int argc, char** argv)
     settings_fname = "settings.xml";
   }
   // Initialize detector and run parameters
-  if (!gPars::InitGlobals(settings_fname)) {
+  if (!settings::Initialize(settings_fname)) {
     std::cerr<<"Failed to initialize globals."<<std::endl;
     return -1;
   }
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   // Seed the random number generator manually
-  G4Random::setTheSeed(gPars::general.initial_seed);
+  G4Random::setTheSeed(settings::general.initial_seed);
 
   // Construct the default run manager
   G4MTRunManager *runManager = new G4MTRunManager;
@@ -48,7 +49,7 @@ int main(int argc, char** argv)
   // Visualization manager
 
   G4VisManager* visManager = nullptr;
-  if (gPars::general.doView) {
+  if (settings::general.do_view) {
     visManager = new G4VisExecutive;
     visManager->SetVerboseLevel(0);
     visManager->Initialize();
@@ -61,19 +62,17 @@ int main(int argc, char** argv)
   UI->ApplyCommand("/event/verbose 0");
   UI->ApplyCommand("/tracking/verbose 0");
   UI->ApplyCommand("/tracking/storeTrajectory 2");
-  if (gPars::general.doView) {
+  if (settings::general.do_view) {
     UI->ApplyCommand("/control/execute vis.mac");
   }
 
-  double THGEM1_z = gPars::det_dims->THGEM1_center.z() - gPars::det_dims->THGEM1_width_total / 2.0;
-  //gData.PlotField("v00.01.01/center_axis_field.txt", G4ThreeVector(0, 0, THGEM1_z * mm - 3 * mm), G4ThreeVector(0, 0, THGEM1_z * mm + 3 * mm), 3000);
-  //gData.PlotField("v00.01.01/x_p0.05_axis_field.txt", G4ThreeVector(0.05 * mm, 0, THGEM1_z * mm - 3 * mm), G4ThreeVector(0.05 * mm, 0, THGEM1_z * mm + 3 * mm), 3000);
-  //gData.PlotField("v00.01.01/y_p0.05_axis_field.txt", G4ThreeVector(0, 0.05 * mm, THGEM1_z * mm - 3 * mm), G4ThreeVector(0, 0.05 * mm, THGEM1_z * mm + 3 * mm), 3000);
-  runManager->BeamOn(gPars::source->N_events);
+  runManager->BeamOn(settings::general.N_events);
 
-  if (gPars::general.doView) {
+  if (settings::general.do_view) {
     UI->ApplyCommand("vis/viewer/update");
-    rename_file("g4_00.wrl", gPars::general.output_folder + "g4_00.wrl");
+    std::filesystem::path old_fname("g4_00.wrl");
+    std::filesystem::path new_fname(settings::general.output_folder + "g4_00.wrl");
+    std::filesystem::rename(old_fname, new_fname);
   }
 
   if (visManager)

@@ -26,4 +26,8 @@ public:
 
   LowGammaPhysicsList(const LowGammaPhysicsList &) = delete;
   LowGammaPhysicsList & operator=(const LowGammaPhysicsList &) = delete;
+
+  void ConstructParticle(void) override;
+  void ConstructProcess(void) override;
+  void SetCuts(void) override;
 };

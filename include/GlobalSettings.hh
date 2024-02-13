@@ -30,12 +30,14 @@ namespace settings
         std::string data_path;
         // std::string settings_filename;
         std::string output_folder;
+        std::string geometry_fname;
         std::string energy_deposition_filename;
         // std::string gnuplot_bin;
         uint thread_number;
         uint N_events;
         bool do_view;
         bool check_geometry_overlap;
+        std::string sensor_volume_name; // name of physical volume
         GenerationPattern source_pattern;
         G4long initial_seed; // If not specified in settings, random time(NULL) is used as starting seed for the simulation
     };

@@ -58,13 +58,14 @@ namespace settings
     general.data_path = "inputs/";
     general.output_folder = "outputs/";
     general.energy_deposition_filename = "energy_histogram.dat";
+    general.geometry_fname = "fname.gdml"; // TODO
+    general.sensor_volume_name = ""; // TODO
     general.thread_number = 1;
     general.N_events = 1;
     general.do_view = true;
     general.check_geometry_overlap = true;
     general.source_pattern = GenerationPattern::CenterCollimated;
     general.initial_seed = 42; // time(NULL)
-
 
     // std::cout << __PRETTY_FUNCTION__ << ": successfully loaded \"" << fname << "\"" << std::endl;
     return true;

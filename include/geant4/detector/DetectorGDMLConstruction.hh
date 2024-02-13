@@ -14,17 +14,34 @@ class DetectorGDMLConstruction : public G4VUserDetectorConstruction
       // parser.SetStripFlag(false);
       parser.SetOverlapCheck(true);
       parser.Read(filename);
-      fWorld = parser.GetWorldVolume();
-
+      world_volume = parser.GetWorldVolume();
+      logic_scintillator = FindScintillator(parser, settings::general.sensor_volume_name);
       // TODO: there is a question on how to handle auxilary info
       // TODO: there is also an issue on how to handle optical surfaces
     }
 
     virtual G4VPhysicalVolume *Construct() {
-      return fWorld;
+      ConstructSDandField();
+      return world_volume;
     }
 
+    virtual void ConstructSDandField(void) override {
+      DetectorSensor *theScintillator = new DetectorSensor("/detector/sensitiveDetector");
+      G4SDManager::GetSDMpointer()->AddNewDetector(theScintillator);
+      SetSensitiveDetector(logic_scintillator, theScintillator);
+    }
+  
+  protected:
+    G4LogicalVolume* FindScintillator(G4GDMLParser& parser, std::string phys_name) const {
+      G4PhysicalVolumeStore* geometry_store = G4PhysicalVolumeStore::GetInstance();
+      G4VPhysicalVolume* phys_vol = geometry_store->GetVolume(phys_name, false);
+      // Can't return G4LogicalVolume from phys_vol because it is const.
+      std::string logical_name = phys_vol->GetLogicalVolume()->GetName();
+      return parser.GetVolume(logical_name);
+    } 
+
   private:
-    G4VPhysicalVolume *fWorld;
+    G4VPhysicalVolume *world_volume;
+    G4LogicalVolume *logic_scintillator;
 };
 

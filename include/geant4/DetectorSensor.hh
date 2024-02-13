@@ -1,5 +1,4 @@
-#ifndef DetectorSensor_h
-#define DetectorSensor_h
+#pragma once
 
 #include <vector>
 #include <iostream>
@@ -16,7 +15,7 @@
 #include "G4ParticleDefinition.hh"
 
 #include <GlobalParameters.hh>
-#include "PhotonHit.hh"
+#include "EnergyDepHit.hh"
 #include <GlobalData.hh>
 
 class DetectorSensor : public G4VSensitiveDetector
@@ -27,12 +26,10 @@ class DetectorSensor : public G4VSensitiveDetector
 
     void Initialize(G4HCofThisEvent*);
     G4bool ProcessHits(G4Step*, G4TouchableHistory*);
-    G4bool ProcessHits_Optical(const G4Step* aStep, G4TouchableHistory* );
     void EndOfEvent(G4HCofThisEvent*);
 
-    static const std::string PhotonCollectionName;
+    static const std::string HitCollectionName;
   protected:
-    PhotonHitCollection *hitCollection;
+    EnergyDepHitCollection *hitCollection;
 };
 
-#endif //DetectorSensor_h
